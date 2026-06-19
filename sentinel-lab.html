@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sentinel SOC Lab | Alex Angelini</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0D1117;
+      --surface: #161B22;
+      --surface2: #1C2128;
+      --border: #21262D;
+      --accent: #00B4D8;
+      --accent-dim: rgba(0,180,216,0.12);
+      --green: #7EE787;
+      --green-dim: rgba(126,231,135,0.1);
+      --text: #E6EDF3;
+      --muted: #8B949E;
+      --mono: 'JetBrains Mono', monospace;
+      --sans: 'Inter', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 15px;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: rgba(13,17,23,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-brand {
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      color: var(--accent);
+      letter-spacing: 0.04em;
+      text-decoration: none;
+    }
+
+    .nav-brand span { color: var(--muted); }
+
+    .nav-back {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-decoration: none;
+      letter-spacing: 0.06em;
+      transition: color 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .nav-back:hover { color: var(--accent); }
+
+    /* HERO */
+    .page-hero {
+      padding: 8rem 2rem 4rem;
+      max-width: 800px;
+      margin: 0 auto;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .breadcrumb {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-bottom: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .breadcrumb a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .breadcrumb a:hover { text-decoration: underline; }
+
+    .page-title {
+      font-family: var(--mono);
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 0.8rem;
+    }
+
+    .page-subtitle {
+      font-size: 1rem;
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+      max-width: 600px;
+    }
+
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .meta-item {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .status-badge {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      background: var(--green-dim);
+      color: var(--green);
+      border: 1px solid rgba(126,231,135,0.3);
+      letter-spacing: 0.04em;
+    }
+
+    .tag {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    .tag.accent {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-dim);
+    }
+
+    /* CONTENT */
+    .content {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 2rem 6rem;
+    }
+
+    /* OVERVIEW CARDS */
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 1rem;
+      padding: 3rem 0 2rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .overview-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.2rem;
+    }
+
+    .overview-label {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.4rem;
+    }
+
+    .overview-value {
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    /* ARCHITECTURE */
+    .arch-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      line-height: 2;
+      color: var(--muted);
+      overflow-x: auto;
+    }
+
+    .arch-block .highlight { color: var(--accent); }
+    .arch-block .green { color: var(--green); }
+    .arch-block .dim { color: #484F58; }
+
+    /* PHASES */
+    .phase {
+      padding: 2.5rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .phase:last-child { border-bottom: none; }
+
+    .phase-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 1.2rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .phase-number {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--accent);
+      background: var(--accent-dim);
+      border: 1px solid rgba(0,180,216,0.3);
+      border-radius: 4px;
+      padding: 0.3rem 0.6rem;
+      white-space: nowrap;
+      margin-top: 0.2rem;
+    }
+
+    .phase-title {
+      font-family: var(--mono);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.3rem;
+    }
+
+    .phase-desc {
+      font-size: 0.875rem;
+      color: var(--muted);
+    }
+
+    .step-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      margin-top: 1.2rem;
+    }
+
+    .step-list li {
+      display: flex;
+      gap: 0.8rem;
+      align-items: flex-start;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .step-list li::before {
+      content: '✓';
+      color: var(--green);
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      margin-top: 0.25rem;
+      flex-shrink: 0;
+    }
+
+    .step-list li strong { color: var(--text); }
+
+    /* CODE BLOCKS */
+    .code-label {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.4rem;
+      margin-top: 1.2rem;
+    }
+
+    .kql-block {
+      background: #0D1117;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1rem 1.2rem;
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      line-height: 1.8;
+      color: var(--muted);
+      overflow-x: auto;
+    }
+
+    .kql-block .kw { color: #FF7B72; }
+    .kql-block .fn { color: #D2A8FF; }
+    .kql-block .str { color: var(--green); }
+    .kql-block .num { color: #79C0FF; }
+    .kql-block .op { color: var(--accent); }
+    .kql-block .cm { color: #484F58; }
+
+    .cmd-block {
+      background: #0D1117;
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: 6px;
+      padding: 1rem 1.2rem;
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: var(--green);
+      overflow-x: auto;
+      margin-top: 0.8rem;
+    }
+
+    /* OUTCOMES */
+    .outcomes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .outcome-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.2rem;
+      border-left: 3px solid var(--green);
+    }
+
+    .outcome-title {
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.4rem;
+    }
+
+    .outcome-desc {
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* SECTION TITLES */
+    .section-label {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 0.4rem;
+      margin-top: 3rem;
+    }
+
+    .section-title {
+      font-family: var(--mono);
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 1.2rem;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem;
+    }
+
+    .footer-inner {
+      max-width: 800px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .footer-brand {
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    .footer-links a {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover { color: var(--accent); }
+
+    @media (max-width: 640px) {
+      .overview-grid { grid-template-columns: repeat(2, 1fr); }
+      .outcomes-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="index.html" class="nav-brand"><span>~/</span>aangelin</a>
+    <a href="index.html" class="nav-back">← Back to portfolio</a>
+  </nav>
+
+  <!-- PAGE HERO -->
+  <div class="page-hero">
+    <div class="breadcrumb">
+      <a href="index.html">Home</a>
+      <span>/</span>
+      <span>Lab Projects</span>
+      <span>/</span>
+      <span>Microsoft Sentinel SOC Lab</span>
+    </div>
+    <h1 class="page-title">Personal Home Lab —<br>Microsoft Sentinel SOC Detection Lab</h1>
+    <p class="page-subtitle">
+      A hybrid cloud/on-premises security monitoring environment built to develop hands-on SOC analyst skills
+      using the same tooling stack found in real MSSP environments.
+    </p>
+    <div class="meta-row">
+      <span class="status-badge">Active</span>
+      <span class="meta-item">📅 June 2026</span>
+      <span class="meta-item">⏱ ~8 hours build time</span>
+      <span class="tag accent">Microsoft Sentinel</span>
+      <span class="tag accent">KQL</span>
+      <span class="tag">Azure</span>
+      <span class="tag">Sysmon</span>
+      <span class="tag">Atomic Red Team</span>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- OVERVIEW STATS -->
+    <div class="overview-grid">
+      <div class="overview-card">
+        <div class="overview-label">Platform</div>
+        <div class="overview-value">Microsoft Azure</div>
+      </div>
+      <div class="overview-card">
+        <div class="overview-label">SIEM</div>
+        <div class="overview-value">Microsoft Sentinel</div>
+      </div>
+      <div class="overview-card">
+        <div class="overview-label">VM</div>
+        <div class="overview-value">Windows Server 2022</div>
+      </div>
+      <div class="overview-card">
+        <div class="overview-label">Hypervisor</div>
+        <div class="overview-value">VirtualBox</div>
+      </div>
+      <div class="overview-card">
+        <div class="overview-label">Attack Sim</div>
+        <div class="overview-value">Atomic Red Team</div>
+      </div>
+      <div class="overview-card">
+        <div class="overview-label">Framework</div>
+        <div class="overview-value">MITRE ATT&CK</div>
+      </div>
+    </div>
+
+    <!-- ARCHITECTURE -->
+    <div class="section-label">// Architecture</div>
+    <h2 class="section-title">Lab Architecture</h2>
+    <div class="arch-block">
+      <span class="dim">┌─────────────────────────────────────────────────────────┐</span><br>
+      <span class="dim">│</span>  <span class="green">HOME LAB (VirtualBox)</span><span class="dim">                                   │</span><br>
+      <span class="dim">│</span>                                                         <span class="dim">│</span><br>
+      <span class="dim">│</span>  <span class="highlight">Windows Server 2022 VM</span>                                  <span class="dim">│</span><br>
+      <span class="dim">│</span>    └── Sysmon (SwiftOnSecurity config)                   <span class="dim">│</span><br>
+      <span class="dim">│</span>    └── Microsoft Monitoring Agent (MMA)                  <span class="dim">│</span><br>
+      <span class="dim">│</span>    └── Atomic Red Team (attack simulation)               <span class="dim">│</span><br>
+      <span class="dim">│</span>                          │                               <span class="dim">│</span><br>
+      <span class="dim">└──────────────────────────┼──────────────────────────────┘</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="highlight">↓ logs via MMA</span><br>
+      <span class="dim">┌─────────────────────────────────────────────────────────┐</span><br>
+      <span class="dim">│</span>  <span class="green">AZURE (Free Tier)</span>                                       <span class="dim">│</span><br>
+      <span class="dim">│</span>                                                         <span class="dim">│</span><br>
+      <span class="dim">│</span>  <span class="highlight">Log Analytics Workspace</span> (law-sentinel-homelab)          <span class="dim">│</span><br>
+      <span class="dim">│</span>    └── Security Events (EventID 4625, 4624, etc.)        <span class="dim">│</span><br>
+      <span class="dim">│</span>    └── Sysmon Events (process creation, network)         <span class="dim">│</span><br>
+      <span class="dim">│</span>    └── Heartbeat (connectivity monitoring)               <span class="dim">│</span><br>
+      <span class="dim">│</span>                          │                               <span class="dim">│</span><br>
+      <span class="dim">│</span>  <span class="highlight">Microsoft Sentinel</span>        │                               <span class="dim">│</span><br>
+      <span class="dim">│</span>    └── KQL Analytics Rules                              <span class="dim">│</span><br>
+      <span class="dim">│</span>    └── Incident Detection                               <span class="dim">│</span><br>
+      <span class="dim">│</span>    └── MITRE ATT&CK Mapping                             <span class="dim">│</span><br>
+      <span class="dim">└─────────────────────────────────────────────────────────┘</span>
+    </div>
+
+    <!-- PHASES -->
+    <div class="section-label" style="margin-top:3rem">// Build Walkthrough</div>
+    <h2 class="section-title">Phase by Phase</h2>
+
+    <!-- PHASE 1 -->
+    <div class="phase">
+      <div class="phase-header">
+        <span class="phase-number">PHASE 01</span>
+        <div>
+          <div class="phase-title">Azure Setup</div>
+          <div class="phase-desc">Created the Azure environment and enabled Microsoft Sentinel on a free-tier subscription.</div>
+        </div>
+      </div>
+      <ul class="step-list">
+        <li>Created a free Azure account at <strong>azure.microsoft.com/free</strong> using a personal Microsoft account</li>
+        <li>Created resource group <strong>rg-sentinel-homelab</strong> in Australia East region</li>
+        <li>Deployed a <strong>Log Analytics Workspace</strong> named <strong>law-sentinel-homelab</strong> — the data store for all logs</li>
+        <li>Enabled <strong>Microsoft Sentinel</strong> on top of the workspace — the SIEM and analytics layer</li>
+        <li>Set a <strong>$10 AUD monthly budget alert</strong> in Azure Cost Management to avoid surprise charges</li>
+      </ul>
+    </div>
+
+    <!-- PHASE 2 -->
+    <div class="phase">
+      <div class="phase-header">
+        <span class="phase-number">PHASE 02</span>
+        <div>
+          <div class="phase-title">Windows VM + Sysmon + Agent</div>
+          <div class="phase-desc">Built the on-premises target machine and connected it to Azure Sentinel.</div>
+        </div>
+      </div>
+      <ul class="step-list">
+        <li>Downloaded <strong>Windows Server 2022 Evaluation ISO</strong> (180-day free trial) from Microsoft Evaluation Center</li>
+        <li>Created a VM in <strong>VirtualBox</strong> named <strong>SentinelTarget-VM</strong> with 4GB RAM, 2 CPUs, 60GB disk</li>
+        <li>Installed <strong>Windows Server 2022 (Desktop Experience)</strong> via the installer wizard</li>
+        <li>Installed <strong>Sysmon v15.20</strong> using the SwiftOnSecurity community config — captures process creation, network connections, and file events beyond standard Windows logging</li>
+        <li>Installed the <strong>Microsoft Monitoring Agent (MMA)</strong> on the VM, connected to the Log Analytics Workspace using Workspace ID and Primary Key</li>
+        <li>Configured the <strong>Windows Security Events via Legacy Agent</strong> connector in Sentinel (Common event set)</li>
+        <li>Created a <strong>Data Collection Rule</strong> in Azure Monitor to define which log channels to forward</li>
+        <li>Verified connectivity by running <strong>Heartbeat | take 10</strong> in Sentinel Logs — confirmed 15+ heartbeats per 15 minutes</li>
+      </ul>
+      <div class="code-label">Sysmon install command</div>
+      <div class="cmd-block">C:\Sysmon\Sysmon64.exe -accepteula -i C:\Sysmon\sysmonconfig.xml</div>
+      <div class="code-label">Verify agent running</div>
+      <div class="cmd-block">Get-Service HealthService<br><br># Expected output:<br># Status   Name          DisplayName<br># Running  HealthService Microsoft Monitoring Agent</div>
+    </div>
+
+    <!-- PHASE 3 -->
+    <div class="phase">
+      <div class="phase-header">
+        <span class="phase-number">PHASE 03</span>
+        <div>
+          <div class="phase-title">Attack Simulation — Atomic Red Team</div>
+          <div class="phase-desc">Simulated real adversary techniques from the MITRE ATT&CK framework to generate detectable log activity.</div>
+        </div>
+      </div>
+      <ul class="step-list">
+        <li>Installed <strong>Invoke-AtomicRedTeam v2.3.0</strong> PowerShell module and downloaded all atomic test definitions</li>
+        <li>Added Defender exclusions for the AtomicRedTeam folder to prevent simulation payloads from being blocked</li>
+        <li>Executed <strong>T1110.001 — Brute Force</strong> simulation, generating a burst of failed logon attempts (EventID 4625)</li>
+        <li>Confirmed events appeared in <strong>Microsoft Sentinel Logs</strong> within minutes of the simulation</li>
+      </ul>
+      <div class="code-label">Install Atomic Red Team</div>
+      <div class="cmd-block">Install-Module -Name invoke-atomicredteam,powershell-yaml -scope CurrentUser -Force<br>IEX (New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/redcanaryco/invoke-atomicredteam/master/install-atomicredteam.ps1'); Install-AtomicRedTeam -getAtomics -Force</div>
+      <div class="code-label">Run brute force simulation</div>
+      <div class="cmd-block">Import-Module invoke-atomicredteam<br>Invoke-AtomicTest T1110.001</div>
+    </div>
+
+    <!-- PHASE 4 -->
+    <div class="phase">
+      <div class="phase-header">
+        <span class="phase-number">PHASE 04</span>
+        <div>
+          <div class="phase-title">KQL Detections</div>
+          <div class="phase-desc">Wrote KQL queries to detect the simulated attacks and validated them against real log data.</div>
+        </div>
+      </div>
+      <ul class="step-list">
+        <li>Confirmed <strong>SecurityEvent</strong> table was receiving data by querying EventID 4625 (failed logon) events</li>
+        <li>Built a brute force detection query grouping failed logons by account, computer, and 5-minute time windows</li>
+        <li>Validated the detection fired against the Atomic Red Team simulation output</li>
+        <li>Enriched the query with MITRE ATT&CK tactic and technique metadata for incident context</li>
+      </ul>
+      <div class="code-label">Brute Force Detection — T1110.001</div>
+      <div class="kql-block">
+<span class="cm">// Detects brute force logon attempts — MITRE T1110.001</span>
+<br><span class="kw">SecurityEvent</span>
+<br><span class="op">|</span> <span class="kw">where</span> TimeGenerated <span class="op">&gt;</span> <span class="fn">ago</span>(<span class="num">1h</span>)
+<br><span class="op">|</span> <span class="kw">where</span> EventID <span class="op">==</span> <span class="num">4625</span>
+<br><span class="op">|</span> <span class="fn">summarize</span> FailedAttempts <span class="op">=</span> <span class="fn">count</span>() <span class="kw">by</span> Account, Computer, IpAddress, <span class="fn">bin</span>(TimeGenerated, <span class="num">5m</span>)
+<br><span class="op">|</span> <span class="kw">where</span> FailedAttempts <span class="op">&gt;</span> <span class="num">3</span>
+<br><span class="op">|</span> <span class="fn">extend</span> Severity <span class="op">=</span> <span class="str">"High"</span>
+<br><span class="op">|</span> <span class="fn">extend</span> MITRETactic <span class="op">=</span> <span class="str">"Credential Access"</span>
+<br><span class="op">|</span> <span class="fn">extend</span> MITRETechnique <span class="op">=</span> <span class="str">"T1110.001 - Brute Force"</span>
+      </div>
+      <div class="code-label">Suspicious PowerShell Execution — T1059.001</div>
+      <div class="kql-block">
+<span class="cm">// Detects suspicious PowerShell execution via Sysmon — MITRE T1059.001</span>
+<br><span class="kw">Event</span>
+<br><span class="op">|</span> <span class="kw">where</span> Source <span class="op">==</span> <span class="str">"Microsoft-Windows-Sysmon"</span>
+<br><span class="op">|</span> <span class="kw">where</span> EventID <span class="op">==</span> <span class="num">1</span>
+<br><span class="op">|</span> <span class="kw">where</span> RenderedDescription <span class="fn">has_any</span>(<span class="str">"powershell"</span>, <span class="str">"pwsh"</span>)
+<br><span class="op">|</span> <span class="kw">where</span> RenderedDescription <span class="fn">has_any</span>(<span class="str">"-enc"</span>, <span class="str">"-EncodedCommand"</span>, <span class="str">"DownloadString"</span>, <span class="str">"-bypass"</span>)
+<br><span class="op">|</span> <span class="fn">project</span> TimeGenerated, Computer, RenderedDescription
+<br><span class="op">|</span> <span class="fn">extend</span> MITRETechnique <span class="op">=</span> <span class="str">"T1059.001 - PowerShell"</span>
+      </div>
+    </div>
+
+    <!-- OUTCOMES -->
+    <div class="section-label">// Results</div>
+    <h2 class="section-title">Key Outcomes</h2>
+    <div class="outcomes-grid">
+      <div class="outcome-card">
+        <div class="outcome-title">End-to-end pipeline</div>
+        <div class="outcome-desc">Attack simulation → log ingestion → KQL detection → Sentinel incident, fully validated.</div>
+      </div>
+      <div class="outcome-card">
+        <div class="outcome-title">Real Security Events</div>
+        <div class="outcome-desc">Confirmed EventID 4625 (failed logon) events flowing from VM into Sentinel within minutes of simulation.</div>
+      </div>
+      <div class="outcome-card">
+        <div class="outcome-title">MITRE ATT&CK mapped</div>
+        <div class="outcome-desc">Detections enriched with tactic and technique metadata aligned to the ATT&CK framework.</div>
+      </div>
+      <div class="outcome-card">
+        <div class="outcome-title">Hybrid architecture</div>
+        <div class="outcome-desc">On-premises VM feeding a cloud SIEM — mirrors real MSSP customer environments.</div>
+      </div>
+    </div>
+
+    <!-- TOOLS -->
+    <div class="section-label" style="margin-top:3rem">// Stack</div>
+    <h2 class="section-title">Tools & Technologies</h2>
+    <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.5rem">
+      <span class="tag accent">Microsoft Sentinel</span>
+      <span class="tag accent">KQL</span>
+      <span class="tag accent">Azure Monitor</span>
+      <span class="tag">Windows Server 2022</span>
+      <span class="tag">VirtualBox</span>
+      <span class="tag">Sysmon v15.20</span>
+      <span class="tag">Microsoft Monitoring Agent</span>
+      <span class="tag">Atomic Red Team v2.3.0</span>
+      <span class="tag">PowerShell</span>
+      <span class="tag">Azure Cloud Shell</span>
+      <span class="tag">MITRE ATT&CK</span>
+      <span class="tag">Log Analytics Workspace</span>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-brand">alex@soc-analyst:~$ <span style="color:var(--accent)">▌</span></div>
+      <div class="footer-links">
+        <a href="https://www.linkedin.com/in/alexangelini" target="_blank">LinkedIn</a>
+        <a href="https://github.com/aangelin" target="_blank">GitHub</a>
+        <a href="mailto:alex_angelini@outlook.com">Email</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
