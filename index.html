@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Alex Angelini | Cybersecurity Analyst</title>
+  <title>Alex Angelini | Desktop Support Officer (Aspiring Cyber Security Analyst)</title>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -78,10 +78,10 @@
 
     /* HERO */
     .hero {
-      min-height: 100vh;
+      min-height: auto;
       display: flex;
       align-items: center;
-      padding: 6rem 2rem 4rem;
+      padding: 6rem 2rem 1.5rem;
       max-width: 900px;
       margin: 0 auto;
     }
@@ -203,7 +203,7 @@
     section {
       max-width: 900px;
       margin: 0 auto;
-      padding: 5rem 2rem;
+      padding: 3rem 2rem 5rem;
       border-top: 1px solid var(--border);
     }
 
@@ -277,6 +277,12 @@
       border: 1px solid rgba(126,231,135,0.3);
       letter-spacing: 0.04em;
       text-transform: uppercase;
+    }
+
+    .project-status.in-progress {
+      background: var(--accent-dim);
+      color: var(--accent);
+      border: 1px solid rgba(0,180,216,0.3);
     }
 
     .project-title {
@@ -558,6 +564,7 @@
     <div class="nav-brand"><span>~/</span>aangelin</div>
     <ul class="nav-links">
       <li><a href="#projects">Projects</a></li>
+      <li><a href="#experience">Experience</a></li>
       <li><a href="#certs">Certs</a></li>
       <li><a href="#about">About</a></li>
     </ul>
@@ -566,32 +573,16 @@
   <!-- HERO -->
   <div class="hero">
     <div class="hero-inner">
-      <div class="terminal-prompt">
-        <span class="user">alex</span>
-        <span class="at">@</span>
-        <span class="host">soc-analyst</span>
-        <span class="path">:~$</span>
-        <span class="dollar">whoami</span>
-      </div>
       <h1>Alex Angelini<span class="cursor"></span></h1>
-      <div class="hero-subtitle">// Desktop Support Officer (Aspiring Cyber Analyst) 
+      <div class="hero-subtitle">// Desktop Support Officer (Aspiring Cyber Security Analyst)</div>
       <p class="hero-desc">
-        Desktop Support Officer at Centorrino Technologies, actively transitioning into cybersecurity and aspiring to become a Cyber Security Analyst.
-        I build home labs and am currently learning practical skills tools that Cyber Security Analysts would use on the job. I  hold BTL1, Security+, and five other certifications. 
-        Please see my site for information about the projects I have undertaken. 
+        Desktop Support Officer at Centorrino Technologies, actively transitioning into cybersecurity as a Cyber Security Analyst.
+        I enjoy building home labs to develop the practical, job-ready skills Cyber Security Analysts use on the job.
+        I hold BTL1, Security+, and four other certifications. This page is dedicated to showcasing my projects —
+        see below for the details behind them.
       </p>
-      <div class="hero-tags">
-        <span class="tag accent">Microsoft Sentinel</span>
-        <span class="tag accent">KQL</span>
-        <span class="tag accent">MITRE ATT&CK</span>
-        <span class="tag">Sysmon</span>
-        <span class="tag">Atomic Red Team</span>
-        <span class="tag">Splunk</span>
-        <span class="tag">Azure</span>
-        <span class="tag">Incident Response</span>
-      </div>
       <div class="hero-cta">
-        <a href="https://www.linkedin.com/in/alexangelini" class="btn btn-primary" target="_blank">↗ LinkedIn</a>
+        <a href="https://www.linkedin.com/in/alex-angelini-4a1918200" class="btn btn-primary" target="_blank">↗ LinkedIn</a>
         <a href="#projects" class="btn btn-secondary">View Projects</a>
       </div>
     </div>
@@ -600,7 +591,7 @@
   <!-- PROJECTS -->
   <section id="projects">
     <div class="section-label">// 01</div>
-    <h2 class="section-title">Lab Projects</h2>
+    <h2 class="section-title">Projects</h2>
     <div class="projects-grid">
 
       <a href="sentinel-lab.html" style="text-decoration:none;color:inherit">
@@ -627,33 +618,13 @@
 
       <div class="project-card">
         <div class="project-header">
-          <div class="project-icon">🔍</div>
-          <span class="project-status">Complete</span>
-        </div>
-        <div class="project-title">BTL1 Corporate Breach Investigation</div>
-        <p class="project-desc">
-          Full corporate breach scenario covering phishing, Meterpreter C2, lateral movement, Mimikatz credential dumping,
-          crypto mining, and data exfiltration. Investigated using Splunk, Autopsy, Wireshark, and VirusTotal.
-        </p>
-        <div class="project-tags">
-          <span class="project-tag">Splunk</span>
-          <span class="project-tag">Autopsy</span>
-          <span class="project-tag">Wireshark</span>
-          <span class="project-tag">VirusTotal</span>
-          <span class="project-tag">DeepBlueCLI</span>
-          <span class="project-tag">Digital Forensics</span>
-        </div>
-      </div>
-
-      <div class="project-card">
-        <div class="project-header">
           <div class="project-icon">🖥️</div>
-          <span class="project-status">Complete</span>
+          <span class="project-status in-progress">In Progress</span>
         </div>
         <div class="project-title">Active Directory Home Lab</div>
         <p class="project-desc">
           On-premises Active Directory environment for practising identity management, GPO configuration,
-          account provisioning, and privilege escalation detection. Integrated with pfSense for network segmentation.
+          account provisioning, and privilege escalation detection.
         </p>
         <div class="project-tags">
           <span class="project-tag">Active Directory</span>
@@ -666,9 +637,39 @@
     </div>
   </section>
 
+  <!-- EXPERIENCE -->
+  <section id="experience">
+    <div class="section-label">// 02</div>
+    <h2 class="section-title">Experience</h2>
+    <div class="projects-grid">
+
+      <div class="project-card">
+        <div class="project-header">
+          <div class="project-icon">⏱️</div>
+          <span class="project-status">Complete</span>
+        </div>
+        <div class="project-title">BTL1 — 24 Hour Incident Response Exam</div>
+        <p class="project-desc">
+          Completed the Blue Team Level 1 practical exam — a 24-hour, full incident response scenario covering
+          phishing analysis, digital forensics, network traffic analysis, and SIEM-based threat hunting under
+          exam time pressure.
+        </p>
+        <div class="project-tags">
+          <span class="project-tag">Incident Response</span>
+          <span class="project-tag">Phishing Analysis</span>
+          <span class="project-tag">Digital Forensics</span>
+          <span class="project-tag">SIEM</span>
+          <span class="project-tag">Splunk</span>
+          <span class="project-tag">Threat Hunting</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
   <!-- CERTS -->
   <section id="certs">
-    <div class="section-label">// 02</div>
+    <div class="section-label">// 03</div>
     <h2 class="section-title">Certifications</h2>
     <div class="certs-grid">
 
@@ -714,9 +715,9 @@
   <!-- FOOTER -->
   <footer>
     <div class="footer-inner">
-      <div class="footer-brand">alex@soc-analyst:~$ <span style="color:var(--accent)">▌</span></div>
+      <div class="footer-brand">Alex Angelini</div>
       <div class="footer-links">
-        <a href="https://www.linkedin.com/in/alexangelini" target="_blank">LinkedIn</a>
+        <a href="https://www.linkedin.com/in/alex-angelini-4a1918200" target="_blank">LinkedIn</a>
         <a href="https://github.com/aangelin" target="_blank">GitHub</a>
         <a href="mailto:alex_angelini@outlook.com">Email</a>
       </div>
