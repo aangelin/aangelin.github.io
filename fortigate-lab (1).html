@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FortiGate Firewall Lab – Alex Angelini</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0D1117;
+      --surface: #161B22;
+      --border: #21262D;
+      --accent: #00B4D8;
+      --green: #7EE787;
+      --text: #E6EDF3;
+      --muted: #8B949E;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      line-height: 1.7;
+    }
+
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background: rgba(13,17,23,0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+    }
+
+    .nav-name {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--accent);
+      font-size: 0.95rem;
+      text-decoration: none;
+    }
+
+    .nav-back {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nav-back:hover { color: var(--accent); }
+
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 7rem 2rem 4rem;
+    }
+
+    .lab-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 1rem;
+    }
+
+    h1 {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.25;
+      margin-bottom: 1rem;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 1.05rem;
+      margin-bottom: 2rem;
+      max-width: 640px;
+    }
+
+    .meta-row {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 3rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .meta-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .meta-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+    }
+
+    .meta-value {
+      font-size: 0.9rem;
+      color: var(--text);
+    }
+
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    .tag.accent { border-color: var(--accent); color: var(--accent); }
+
+    section {
+      margin-bottom: 3rem;
+    }
+
+    h2 {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--accent);
+      margin-bottom: 1.2rem;
+    }
+
+    p {
+      color: #C9D1D9;
+      margin-bottom: 1rem;
+      font-size: 0.97rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .card-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      color: var(--text);
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .card p {
+      font-size: 0.9rem;
+      margin-bottom: 0;
+    }
+
+    .step-list {
+      list-style: none;
+      counter-reset: steps;
+    }
+
+    .step-list li {
+      counter-increment: steps;
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.2rem;
+      align-items: flex-start;
+    }
+
+    .step-list li::before {
+      content: counter(steps, decimal-leading-zero);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--accent);
+      min-width: 28px;
+      padding-top: 0.15rem;
+    }
+
+    .step-list li span {
+      color: #C9D1D9;
+      font-size: 0.95rem;
+    }
+
+    .cli-block {
+      background: #010409;
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: 6px;
+      padding: 1.2rem 1.5rem;
+      margin: 1rem 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--green);
+      overflow-x: auto;
+      line-height: 1.8;
+    }
+
+    .cli-block .prompt { color: var(--muted); }
+
+    .finding-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    @media (max-width: 600px) {
+      .finding-grid { grid-template-columns: 1fr; }
+      h1 { font-size: 1.5rem; }
+    }
+
+    .finding-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.2rem;
+    }
+
+    .finding-icon {
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .finding-card h3 {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--text);
+      margin-bottom: 0.4rem;
+    }
+
+    .finding-card p {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .policy-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    .policy-table th {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      text-align: left;
+      padding: 0.6rem 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .policy-table td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border);
+      color: #C9D1D9;
+      font-size: 0.85rem;
+    }
+
+    .policy-table tr:last-child td { border-bottom: none; }
+
+    .action-deny { color: #F85149; font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; }
+    .action-accept { color: var(--green); font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; }
+    .action-implicit { color: var(--muted); font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; }
+
+    .lessons-list {
+      list-style: none;
+    }
+
+    .lessons-list li {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 0.8rem;
+      align-items: flex-start;
+      color: #C9D1D9;
+      font-size: 0.95rem;
+    }
+
+    .lessons-list li::before {
+      content: '→';
+      color: var(--accent);
+      font-family: 'JetBrains Mono', monospace;
+      min-width: 18px;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 2.5rem 0;
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="https://aangelin.github.io" class="nav-name">alex@angelini:~$</a>
+  <a href="https://aangelin.github.io" class="nav-back">← back to portfolio</a>
+</nav>
+
+<div class="container">
+
+  <div class="lab-tag">// project writeup</div>
+
+  <h1>FortiGate VM Firewall Lab<br/>Enterprise Firewall Deployment & Policy Configuration</h1>
+
+
+
+  <div class="meta-row">
+    <div class="meta-item">
+      <span class="meta-label">Status</span>
+      <span class="meta-value" style="color: var(--green);">✓ Completed</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Date</span>
+      <span class="meta-value">June 2026</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Platform</span>
+      <span class="meta-value">VMware Workstation Pro 26H1</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Firmware</span>
+      <span class="meta-value">FortiOS v7.4.12 (Mature)</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Skills</span>
+      <div class="tag-list">
+        <span class="tag accent">FortiGate</span>
+        <span class="tag">FortiOS CLI</span>
+        <span class="tag">VMware Workstation</span>
+        <span class="tag">Network Policy</span>
+        <span class="tag">FortiCloud</span>
+        <span class="tag">Firewall Rules</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- OVERVIEW -->
+  <section>
+    <h2>// overview</h2>
+    <p>This lab covers the full deployment lifecycle of a FortiGate-VM — from sourcing the correct image and navigating hypervisor compatibility issues, through CLI-based interface configuration, GUI access, and FortiCloud license activation, to building and ordering a real firewall policy set. The goal was to get hands-on with FortiOS fundamentals: CLI syntax, zone-based policy logic, Internet Service objects, and traffic logging.</p>
+  </section>
+
+  <hr class="divider"/>
+
+  <!-- LAB ENVIRONMENT -->
+  <section>
+    <h2>// lab environment</h2>
+    <div class="finding-grid">
+      <div class="finding-card">
+        <div class="finding-icon">🖥️</div>
+        <h3>Hypervisor</h3>
+        <p>VMware Workstation Pro 26H1 — FortiGate's native virtualisation platform, eliminating hardware compatibility issues present with VirtualBox</p>
+      </div>
+      <div class="finding-card">
+        <div class="finding-icon">🔥</div>
+        <h3>FortiGate-VM</h3>
+        <p>FortiOS v7.4.12 (Mature build) — imported via OVF from Fortinet's official VM download portal using a free FortiCare account</p>
+      </div>
+      <div class="finding-card">
+        <div class="finding-icon">🌐</div>
+        <h3>WAN (port1)</h3>
+        <p>VMware NAT adapter — FortiGate receives a DHCP lease from VMware's NAT engine and routes internet traffic through the host machine</p>
+      </div>
+      <div class="finding-card">
+        <div class="finding-icon">🔒</div>
+        <h3>LAN (port2)</h3>
+        <p>VMware Host-only adapter (VMnet1, 192.168.122.0/24) — provides isolated management access and simulates a LAN segment for client traffic</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider"/>
+
+  <!-- DEPLOYMENT STEPS -->
+  <section>
+    <h2>// deployment steps</h2>
+    <ol class="step-list">
+      <li><span>Downloaded FortiGate-VM OVF package (v7.4.12) from Fortinet's VM image download portal using a free FortiCare account</span></li>
+      <li><span>Imported OVF into VMware Workstation Pro — configured port1 as Bridged/NAT (WAN) and port2 as Host-only VMnet1 (LAN)</span></li>
+      <li><span>Completed first-boot login via VMware console, set admin password, and configured port2 with a static IP for management access</span></li>
+      <li><span>Accessed the FortiGate web GUI at <code style="font-family: JetBrains Mono; color: var(--accent); font-size: 0.85em;">https://192.168.122.254</code> from the host browser</span></li>
+      <li><span>Activated the permanent evaluation license via FortiCloud credentials in the GUI — FortiGate rebooted and came up fully licensed</span></li>
+      <li><span>Verified internet connectivity from FortiGate CLI with <code style="font-family: JetBrains Mono; color: var(--accent); font-size: 0.85em;">execute ping 8.8.8.8</code> — 0% packet loss confirmed</span></li>
+    </ol>
+
+    <div class="cli-block">
+<span class="prompt">FortiGate-VM64 # </span>config system interface
+<span class="prompt">FortiGate-VM64 (interface) # </span>edit port2
+<span class="prompt">FortiGate-VM64 (port2) # </span>set mode static
+<span class="prompt">FortiGate-VM64 (port2) # </span>set ip 192.168.122.254 255.255.255.0
+<span class="prompt">FortiGate-VM64 (port2) # </span>set allowaccess https ping ssh
+<span class="prompt">FortiGate-VM64 (port2) # </span>end
+
+<span class="prompt">FortiGate-VM64 # </span>execute ping 8.8.8.8
+PING 8.8.8.8: 56 data bytes
+64 bytes from 8.8.8.8: icmp_seq=0 ttl=128 time=14.9 ms
+--- 8.8.8.8 ping statistics ---
+5 packets transmitted, 5 received, <span style="color: var(--green);">0% packet loss</span>
+    </div>
+  </section>
+
+  <hr class="divider"/>
+
+  <!-- FIREWALL POLICY CONFIGURATION -->
+  <section>
+    <h2>// firewall policy configuration</h2>
+    <p>Built a structured three-tier policy set demonstrating proper rule hierarchy — specific deny rules above general allow rules, with FortiGate's implicit deny-all as the final catch. Used FortiGate's Internet Service Database (ISDB) to block Facebook by service category rather than raw IP, which is a more realistic and maintainable enterprise approach.</p>
+
+    <div class="card" style="margin-bottom: 1.5rem;">
+      <table class="policy-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Policy Name</th>
+            <th>Source</th>
+            <th>Destination</th>
+            <th>Action</th>
+            <th>Log</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="font-family: JetBrains Mono; color: var(--muted); font-size: 0.78rem;">1</td>
+            <td style="font-family: JetBrains Mono; font-size: 0.82rem;">Block-Facebook</td>
+            <td>all</td>
+            <td>Facebook-Web, DNS, ICMP</td>
+            <td><span class="action-deny">⊘ DENY</span></td>
+            <td style="color: var(--green); font-size: 0.82rem;">✓</td>
+          </tr>
+          <tr>
+            <td style="font-family: JetBrains Mono; color: var(--muted); font-size: 0.78rem;">2</td>
+            <td style="font-family: JetBrains Mono; font-size: 0.82rem;">LAN-to-WAN-Allow</td>
+            <td>all</td>
+            <td>all</td>
+            <td><span class="action-accept">✓ ACCEPT</span></td>
+            <td style="color: var(--green); font-size: 0.82rem;">✓</td>
+          </tr>
+          <tr>
+            <td style="font-family: JetBrains Mono; color: var(--muted); font-size: 0.78rem;">—</td>
+            <td style="font-family: JetBrains Mono; font-size: 0.82rem;">implicit_deny</td>
+            <td>all</td>
+            <td>all</td>
+            <td><span class="action-implicit">⊘ DENY (default)</span></td>
+            <td>—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p style="font-size: 0.88rem; color: var(--muted);">Rule ordering is critical: FortiGate evaluates policies top-to-bottom and matches on the first hit. The Block-Facebook deny rule must sit above the general LAN-to-WAN allow rule, otherwise Facebook traffic would be permitted before the deny is evaluated.</p>
+  </section>
+
+
+
+</div>
+</body>
+</html>
